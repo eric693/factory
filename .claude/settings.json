@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk '{print $1}')",
+      "Bash(xargs sed -i \"s|http://localhost:5100/api|/api|g; s|http://localhost:5100|/api|g\")",
+      "Bash(kill 3602743)",
+      "Bash(npm run *)",
+      "Bash(curl -s -X POST http://localhost:5174/api/users/login -H \"Content-Type: application/json\" -d '{\"username\":\"admin\",\"password\":\"admin123\"}')",
+      "Bash(sqlite3 factory.db \".schema work_orders\")",
+      "Bash(npx vite *)",
+      "Bash(curl -s http://localhost:5100/api/work-orders)",
+      "Bash(curl -s http://localhost:5174/kanban)"
+    ]
+  }
+}
