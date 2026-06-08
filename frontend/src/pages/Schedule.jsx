@@ -131,6 +131,8 @@ export default function Schedule() {
   const [showUrgent, setShowUrgent] = useState(false);
   const totalDays = 28;
   const cellWidth = 48;
+  const ROW_H = 60;
+  const LABEL_W = 180;
 
   const { data, isLoading } = useQuery({
     queryKey: ['gantt', viewStart.format('YYYY-MM-DD')],
@@ -230,20 +232,20 @@ export default function Schedule() {
       {isLoading ? (
         <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-2 border-brand-600 border-t-transparent" /></div>
       ) : (
-        <div className="card overflow-hidden">
+        <div className="card overflow-hidden p-0">
           <div className="overflow-x-auto">
-            <div style={{ minWidth: `${200 + totalDays * cellWidth}px` }}>
+            <div style={{ minWidth: `${LABEL_W + totalDays * cellWidth}px` }}>
               {/* Header */}
-              <div className="flex border-b border-slate-100 bg-slate-50">
-                <div className="w-[200px] shrink-0 px-3 py-2 text-xs font-semibold text-slate-500 border-r border-slate-100">機台</div>
+              <div className="flex border-b border-slate-200 bg-slate-50 sticky top-0 z-10">
+                <div style={{ width: LABEL_W, height: 44 }} className="shrink-0 px-4 flex items-center text-xs font-semibold text-slate-500 border-r border-slate-200">機台</div>
                 <div className="flex">
                   {days.map((d, i) => {
                     const isToday = d.isSame(today, 'day');
                     const isWeekend = d.day() === 0 || d.day() === 6;
                     return (
-                      <div key={i} style={{ width: cellWidth }} className={`text-center py-2 border-r border-slate-100 last:border-0 ${isToday ? 'bg-brand-50' : ''}`}>
-                        <div className={`text-xs font-bold ${isToday ? 'text-brand-600' : isWeekend ? 'text-slate-300' : 'text-slate-600'}`}>{d.format('D')}</div>
-                        <div className={`text-xs ${isToday ? 'text-brand-400' : 'text-slate-300'}`}>{['日','一','二','三','四','五','六'][d.day()]}</div>
+                      <div key={i} style={{ width: cellWidth, height: 44 }} className={`flex flex-col items-center justify-center border-r border-slate-100 last:border-0 ${isToday ? 'bg-brand-100/70' : isWeekend ? 'bg-slate-100/60' : ''}`}>
+                        <div className={`text-xs font-bold leading-none ${isToday ? 'text-brand-700' : isWeekend ? 'text-slate-300' : 'text-slate-600'}`}>{d.format('D')}</div>
+                        <div className={`text-[10px] leading-none mt-0.5 ${isToday ? 'text-brand-500' : 'text-slate-300'}`}>{['日','一','二','三','四','五','六'][d.day()]}</div>
                       </div>
                     );
                   })}
@@ -255,20 +257,22 @@ export default function Schedule() {
                 const machineWOs = workOrders.filter(w => w.machine_id === machine.id);
                 const isBottleneck = machine.id === bottleneckId;
                 return (
-                  <div key={machine.id} className={`flex border-b border-slate-100 last:border-0 ${isBottleneck ? 'bg-red-50/30' : 'hover:bg-slate-50/50'}`}>
-                    <div className={`w-[200px] shrink-0 px-3 py-3 border-r border-slate-100 ${isBottleneck ? 'border-r-red-200' : ''}`}>
-                      <div className="flex items-center gap-1.5">
-                        <div className="text-sm font-medium text-slate-700 truncate">{machine.name}</div>
-                        {isBottleneck && <span className="badge bg-red-100 text-red-700 text-xs">瓶頸</span>}
+                  <div key={machine.id} style={{ height: ROW_H }} className={`flex border-b border-slate-100 last:border-0 ${isBottleneck ? 'bg-red-50/40' : 'hover:bg-slate-50/60'}`}>
+                    {/* 機台名稱（垂直置中,與甘特條同高）*/}
+                    <div style={{ width: LABEL_W }} className={`shrink-0 px-4 flex flex-col justify-center border-r ${isBottleneck ? 'border-r-red-200 bg-red-50/40' : 'border-slate-200 bg-white'}`}>
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="text-sm font-semibold text-slate-700 truncate">{machine.name}</span>
+                        {isBottleneck && <span className="shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-red-100 text-red-700">瓶頸</span>}
                       </div>
-                      <div className="text-xs text-slate-400">{machine.code}</div>
+                      <div className="text-xs text-slate-400 mt-0.5">{machine.code}</div>
                     </div>
-                    <div className="relative flex" style={{ height: 56 }}>
+                    {/* 甘特區（cells + bars 同高）*/}
+                    <div className="relative flex" style={{ height: ROW_H }}>
                       {days.map((d, i) => {
                         const isToday = d.isSame(today, 'day');
                         const isWeekend = d.day() === 0 || d.day() === 6;
                         return (
-                          <div key={i} style={{ width: cellWidth }} className={`h-full border-r border-slate-100 last:border-0 ${isToday ? 'bg-brand-50/60' : isWeekend ? 'bg-slate-50/80' : ''}`} />
+                          <div key={i} style={{ width: cellWidth }} className={`h-full border-r border-slate-100 last:border-0 ${isToday ? 'bg-brand-50' : isWeekend ? 'bg-slate-50/70' : ''}`} />
                         );
                       })}
                       {machineWOs.map(wo => (

@@ -126,17 +126,19 @@ export default function Dashboard() {
       {/* 快速入口 - 手機顯示 */}
       <div className="md:hidden grid grid-cols-4 gap-2">
         {[
-          { label: '新增訂單', path: '/orders', icon: '📋' },
-          { label: '回報工單', path: '/work-orders', icon: '🔧' },
-          { label: '異常通報', path: '/anomalies', icon: '⚠️' },
-          { label: '生產看板', path: '/kanban', icon: '📺' },
+          { label: '新增訂單', path: '/orders', color: 'text-brand-600 bg-brand-50', icon: <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2 M9 3h6v4H9z" /> },
+          { label: '回報工單', path: '/work-orders', color: 'text-indigo-600 bg-indigo-50', icon: <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" /> },
+          { label: '異常通報', path: '/anomalies', color: 'text-red-600 bg-red-50', icon: <><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></> },
+          { label: '生產看板', path: '/kanban', color: 'text-green-600 bg-green-50', icon: <><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></> },
         ].map(item => (
           <button
             key={item.path}
             onClick={() => navigate(item.path)}
-            className="card p-2 text-center active:scale-95 transition-transform"
+            className="card p-2.5 text-center active:scale-95 transition-transform"
           >
-            <div className="text-xl mb-1">{item.icon}</div>
+            <div className={`w-9 h-9 mx-auto mb-1.5 rounded-xl flex items-center justify-center ${item.color}`}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">{item.icon}</svg>
+            </div>
             <div className="text-xs text-slate-600 font-medium leading-tight">{item.label}</div>
           </button>
         ))}

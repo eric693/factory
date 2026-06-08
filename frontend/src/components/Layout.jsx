@@ -12,118 +12,19 @@ const NOTIF_SEVERITY = {
   medium: 'text-amber-600 bg-amber-50',
   low:    'text-blue-600 bg-blue-50',
 };
+// 通知類型 → SVG path（不用 emoji）
 const NOTIF_ICON = {
-  overdue:     '📋',
-  anomaly:     '⚠️',
-  capacity:    '📊',
-  shortage:    '📦',
-  maintenance: '🔧',
+  overdue:     <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2 M9 3h6v4H9z" />,
+  anomaly:     <><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></>,
+  capacity:    <><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></>,
+  shortage:    <><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></>,
+  maintenance: <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" />,
 };
-
-function NotificationBell() {
-  const [open, setOpen] = useState(false);
-  const { data } = useQuery({ queryKey: ['notifications'], queryFn: getNotifications, refetchInterval: 60000 });
-  const count = data?.count || 0;
-  const items = data?.items || [];
-
+function NotifIcon({ type, className }) {
   return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen(v => !v)}
-        className="relative w-8 h-8 flex items-center justify-center rounded-full text-brand-300 hover:text-white hover:bg-brand-800/60 transition-colors"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">
-          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
-        </svg>
-        {count > 0 && (
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-            {count > 9 ? '9+' : count}
-          </span>
-        )}
-      </button>
-
-      {open && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-10 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden">
-            <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-              <span className="font-semibold text-slate-800">通知中心</span>
-              {count > 0 && <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">{count} 則</span>}
-            </div>
-            <div className="max-h-80 overflow-y-auto">
-              {items.length === 0 ? (
-                <div className="text-sm text-slate-400 text-center py-8">目前沒有通知</div>
-              ) : (
-                items.map((n, i) => (
-                  <div key={i} className={`flex items-start gap-3 px-4 py-3 border-b border-slate-50 last:border-0 ${NOTIF_SEVERITY[n.severity] || ''}`}>
-                    <span className="text-base shrink-0 mt-0.5">{NOTIF_ICON[n.type] || '•'}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold leading-tight">{n.title}</div>
-                      {n.body && <div className="text-xs opacity-70 mt-0.5 truncate">{n.body}</div>}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
-function MobileNotifBell() {
-  const [open, setOpen] = useState(false);
-  const { data } = useQuery({ queryKey: ['notifications'], queryFn: getNotifications, refetchInterval: 60000 });
-  const count = data?.count || 0;
-  const items = data?.items || [];
-
-  return (
-    <>
-      <button
-        onClick={() => setOpen(v => !v)}
-        className="relative text-slate-400 hover:text-slate-600 w-8 h-8 flex items-center justify-center"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">
-          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
-        </svg>
-        {count > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-            {count > 9 ? '9+' : count}
-          </span>
-        )}
-      </button>
-
-      {open && (
-        <div className="fixed inset-0 z-50 flex items-end" onClick={() => setOpen(false)}>
-          <div className="absolute inset-0 bg-black/40" />
-          <div className="relative bg-white w-full rounded-t-2xl shadow-2xl max-h-[70vh] flex flex-col" onClick={e => e.stopPropagation()}>
-            <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-              <span className="font-semibold text-slate-800">通知中心</span>
-              <button onClick={() => setOpen(false)} className="text-slate-400 text-sm">關閉</button>
-            </div>
-            <div className="overflow-y-auto flex-1">
-              {items.length === 0 ? (
-                <div className="text-sm text-slate-400 text-center py-8">目前沒有通知</div>
-              ) : (
-                items.map((n, i) => (
-                  <div key={i} className="flex items-start gap-3 px-4 py-3 border-b border-slate-50 last:border-0">
-                    <span className="text-base shrink-0 mt-0.5">{NOTIF_ICON[n.type] || '•'}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-slate-800 leading-tight">{n.title}</div>
-                      {n.body && <div className="text-xs text-slate-400 mt-0.5">{n.body}</div>}
-                    </div>
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${n.severity === 'high' ? 'bg-red-100 text-red-600' : n.severity === 'medium' ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'}`}>
-                      {n.severity === 'high' ? '緊急' : n.severity === 'medium' ? '注意' : '提醒'}
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className={className || 'w-4 h-4'}>
+      {NOTIF_ICON[type] || <circle cx="12" cy="12" r="3" />}
+    </svg>
   );
 }
 
@@ -150,7 +51,6 @@ const analysisNavItems = [
   { to: '/boss', label: '管理總覽', icon: GridIcon },
   { to: '/analytics', label: '分析報表', icon: ChartIcon },
   { to: '/capacity-plan', label: '產能規劃', icon: CalendarIcon },
-  { to: '/oee', label: 'OEE 稼動率', icon: GaugeIcon },
   { to: '/mrp', label: '物料 MRP', icon: LayersIcon },
   { to: '/cost', label: '成本分析', icon: CoinIcon },
 ];
@@ -343,6 +243,113 @@ function LogoutIcon() {
   </svg>;
 }
 
+function NotificationBell() {
+  const [open, setOpen] = useState(false);
+  const { data } = useQuery({ queryKey: ['notifications'], queryFn: getNotifications, refetchInterval: 60000 });
+  const count = data?.count || 0;
+  const items = data?.items || [];
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="relative w-8 h-8 flex items-center justify-center rounded-full text-brand-300 hover:text-white hover:bg-brand-800/60 transition-colors"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
+        </svg>
+        {count > 0 && (
+          <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            {count > 9 ? '9+' : count}
+          </span>
+        )}
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-10 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden">
+            <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+              <span className="font-semibold text-slate-800">通知中心</span>
+              {count > 0 && <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">{count} 則</span>}
+            </div>
+            <div className="max-h-80 overflow-y-auto">
+              {items.length === 0 ? (
+                <div className="text-sm text-slate-400 text-center py-8">目前沒有通知</div>
+              ) : (
+                items.map((n, i) => (
+                  <div key={i} className={`flex items-start gap-3 px-4 py-3 border-b border-slate-50 last:border-0 ${NOTIF_SEVERITY[n.severity] || ''}`}>
+                    <span className="shrink-0 mt-0.5"><NotifIcon type={n.type} /></span>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold leading-tight">{n.title}</div>
+                      {n.body && <div className="text-xs opacity-70 mt-0.5 truncate">{n.body}</div>}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function MobileNotifBell() {
+  const [open, setOpen] = useState(false);
+  const { data } = useQuery({ queryKey: ['notifications'], queryFn: getNotifications, refetchInterval: 60000 });
+  const count = data?.count || 0;
+  const items = data?.items || [];
+
+  return (
+    <>
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="relative text-slate-400 hover:text-slate-600 w-8 h-8 flex items-center justify-center"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
+        </svg>
+        {count > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            {count > 9 ? '9+' : count}
+          </span>
+        )}
+      </button>
+
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-end" onClick={() => setOpen(false)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="relative bg-white w-full rounded-t-2xl shadow-2xl max-h-[70vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+              <span className="font-semibold text-slate-800">通知中心</span>
+              <button onClick={() => setOpen(false)} className="text-slate-400 text-sm">關閉</button>
+            </div>
+            <div className="overflow-y-auto flex-1">
+              {items.length === 0 ? (
+                <div className="text-sm text-slate-400 text-center py-8">目前沒有通知</div>
+              ) : (
+                items.map((n, i) => (
+                  <div key={i} className="flex items-start gap-3 px-4 py-3 border-b border-slate-50 last:border-0">
+                    <span className={`shrink-0 mt-0.5 w-7 h-7 rounded-lg flex items-center justify-center ${NOTIF_SEVERITY[n.severity] || 'text-slate-500 bg-slate-50'}`}><NotifIcon type={n.type} /></span>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold text-slate-800 leading-tight">{n.title}</div>
+                      {n.body && <div className="text-xs text-slate-400 mt-0.5">{n.body}</div>}
+                    </div>
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${n.severity === 'high' ? 'bg-red-100 text-red-600' : n.severity === 'medium' ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'}`}>
+                      {n.severity === 'high' ? '緊急' : n.severity === 'medium' ? '注意' : '提醒'}
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 function NavSection({ title, items }) {
   return (
     <div className="mt-4 pt-4 border-t border-brand-800/60">
@@ -350,7 +357,7 @@ function NavSection({ title, items }) {
       <div className="space-y-1">
         {items.map(({ to, label, icon: Icon }) => (
           <NavLink
-            key={to}
+            key={to + label}
             to={to}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${

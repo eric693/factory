@@ -13,7 +13,6 @@ const Schedule = lazy(() => import('./pages/Schedule'));
 const WorkOrders = lazy(() => import('./pages/WorkOrders'));
 const Shipments = lazy(() => import('./pages/Shipments'));
 const Analytics = lazy(() => import('./pages/Analytics'));
-const OEE = lazy(() => import('./pages/OEE'));
 const MRP = lazy(() => import('./pages/MRP'));
 const QRScan = lazy(() => import('./pages/QRScan'));
 const CustomerPortal = lazy(() => import('./pages/CustomerPortal'));
@@ -84,7 +83,6 @@ function ProtectedRoutes() {
         <Route path="/work-orders" element={<WorkOrders />} />
         <Route path="/shipments" element={<Shipments />} />
         <Route path="/analytics" element={<Analytics />} />
-        <Route path="/oee" element={<OEE />} />
         <Route path="/mrp" element={<MRP />} />
         <Route path="/anomalies" element={<Anomalies />} />
         <Route path="/handovers" element={<Handovers />} />
